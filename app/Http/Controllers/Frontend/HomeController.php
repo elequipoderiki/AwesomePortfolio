@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactMail;
 use App\Models\About;
+use App\Models\Blog;
+use App\Models\BlogSectionSetting;
 use App\Models\Category;
+use App\Models\ContactSectionSetting;
 use App\Models\Experience;
 use App\Models\Feedback;
 use App\Models\FeedbackSectionSetting;
@@ -16,6 +20,7 @@ use App\Models\SkillItem;
 use App\Models\SkillSectionSetting;
 use App\Models\TyperTitle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 
 class HomeController extends Controller
@@ -33,6 +38,9 @@ class HomeController extends Controller
     	$experience = Experience::first();
         $feedbacks = Feedback::all();
         $feedbackTitle = FeedbackSectionSetting::first();
+        $blogs = Blog::latest()->take(5)->get();
+        $blogTitle = BlogSectionSetting::first();
+        $contactTitle = ContactSectionSetting::first();
 
         return view('frontend.home', 
     			compact(
@@ -47,12 +55,41 @@ class HomeController extends Controller
                     'skillItems',
                     'experience',
                     'feedbacks',
-                    'feedbackTitle'
+                    'feedbackTitle',
+                    'blogs',
+                    'blogTitle',
+                    'contactTitle'
     			));
     }
 
     public function showPortfolio($id) {
     	$portfolio = PortfolioItem::findOrFail($id);
     	return view('frontend.portfolio-details', compact('portfolio'));
+    }
+
+    public function showBlog($id) {
+        $blog = Blog::findOrFail($id);
+        $previousPost = Blog::where('id', '<', $blog->id)->orderBy('id', 'desc')->first();
+        $nextPost = Blog::where('id', '>', $blog->id)->orderBy('id', 'asc')->first();
+
+        return view('frontend.blog-details', compact('blog', 'previousPost', 'nextPost'));
+    }
+
+    public function blog() {
+        $blogs = Blog::latest()->paginate(2);
+        return view('frontend.blog', compact('blogs'));
+    }
+
+    public function contact(Request $request) {
+        $request->validate([
+            'name' => ['required', 'max:200'],
+            'subject' => ['required', 'max:300'],
+            'email' => ['required', 'email'],
+            'message' => ['required', 'max:2000']
+        ]);        
+
+        Mail::send(new ContactMail($request->all()));
+
+        return response(['status' => 'success', 'message' => 'Mail sended successfully!']);
     }
 }

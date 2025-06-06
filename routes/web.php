@@ -3,20 +3,31 @@
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\BlogSectionSettingController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactSectionSettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExperienceController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\FeedbackSectionSettingController;
+use App\Http\Controllers\Admin\FooterContactInfoController;
+use App\Http\Controllers\Admin\FooterHelpLinkController;
+use App\Http\Controllers\Admin\FooterInfoController;
+use App\Http\Controllers\Admin\FooterSocialLinkController;
+use App\Http\Controllers\Admin\FooterUsefulLinkController;
+use App\Http\Controllers\Admin\GeneralSettingController;
 use App\Http\Controllers\Admin\HeroController;
 use App\Http\Controllers\Admin\PortfolioItemController;
 use App\Http\Controllers\Admin\PortfolioSectionSettingController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SeoSettingController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SkillItemController;
 use App\Http\Controllers\Admin\SkillSectionSettingController;
 use App\Http\Controllers\Admin\TyperTitleController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Models\FooterInfo;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +64,12 @@ require __DIR__.'/auth.php';
 
 Route::get('portfolio-details/{id}', [HomeController::class, 'showPortfolio'])->name('show.portfolio');
 
+Route::get('blog-details/{id}', [HomeController::class, 'showBlog'])->name('show.blog');
+
+Route::get('blogs', [HomeController::class, 'blog'])->name('blog');
+
+Route::post('contact', [HomeController::class, 'contact'])->name('contact');
+
 Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], function() {
 	Route::resource('hero', HeroController::class);
 	Route::resource('typer-title', TyperTitleController::class);
@@ -82,4 +99,24 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
 	Route::resource('blog-category', BlogCategoryController::class);
 
 	Route::resource('blog', BlogController::class);
+
+	Route::resource('blog-section-setting', BlogSectionSettingController::class);
+
+	Route::resource('contact-section-setting', ContactSectionSettingController::class);
+
+	Route::resource('footer-social', FooterSocialLinkController::class);
+
+	Route::resource('footer-info', FooterInfoController::class);
+
+	Route::resource('footer-contact-info', FooterContactInfoController::class);
+
+	Route::resource('footer-useful-links', FooterUsefulLinkController::class);
+
+	Route::resource('footer-help-links', FooterHelpLinkController::class);
+
+	Route::get('settings', SettingController::class)->name('settings.index');
+
+	Route::resource('general-setting', GeneralSettingController::class);
+
+	Route::resource('seo-setting', SeoSettingController::class);
 });
